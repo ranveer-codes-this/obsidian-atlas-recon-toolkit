@@ -35,10 +35,9 @@ Designed around a modular architecture, each reconnaissance engine operates inde
 
 🎥 **Project Walkthrough**
 
-> Click below to watch the complete project demonstration.
+> Watch the complete demonstration of OBSIDIAN ATLAS in action.
 
-[▶ Watch Demo Video](assets/demo_compressed.mp4)
-```
+[▶ Download Demo Video](assets/demo_compressed.mp4)
 
 ---
 
