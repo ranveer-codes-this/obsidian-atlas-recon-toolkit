@@ -8,7 +8,7 @@
 
 <br>
 
-<img src="assets/dashboard-home.png" width="100%">
+<img src="assets/dashboard-home.png" width="95%">
 
 <br>
 
@@ -35,10 +35,9 @@ Designed around a modular architecture, each reconnaissance engine operates inde
 
 🎥 **Project Walkthrough**
 
-> Upload your 1-minute demo video to GitHub Releases or convert it into `assets/demo.gif`.
+> Click below to watch the complete project demonstration.
 
-```text
-Demo GIF / Video Here
+[▶ Watch Demo Video](assets/demo_compressed.mp4)
 ```
 
 ---
@@ -47,25 +46,33 @@ Demo GIF / Video Here
 
 ## Tactical Dashboard
 
-<img src="assets/dashboard-home.png">
+<p align="center">
+<img src="assets/dashboard-home.png" width="100%">
+</p>
 
 ---
 
 ## Mission Console
 
-<img src="assets/mission-console.png">
+<p align="center">
+<img src="assets/mission-console.png" width="100%">
+</p>
 
 ---
 
 ## Intelligence Report
 
-<img src="assets/report-summary.png">
+<p align="center">
+<img src="assets/report_summary.png" width="100%">
+</p>
 
 ---
 
 ## Download Center
 
-<img src="assets/download-page.png">
+<p align="center">
+<img src="assets/download_page.png" width="100%">
+</p>
 
 ---
 
@@ -361,6 +368,7 @@ Passive Attack Surface Intelligence Framework
 
 **Version 1.0.0**
 
-Made with ❤️ for Cybersecurity Learning
+![Made With](https://img.shields.io/badge/Made%20With-Python-yellow?style=for-the-badge)
+Built for Ethical Hacking, Security Research and Attack Surface Intelligence.
 
 </div>
