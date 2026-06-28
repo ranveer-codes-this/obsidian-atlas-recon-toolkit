@@ -4,14 +4,18 @@
 
 ### Passive Attack Surface Intelligence Framework
 
-*Know the surface before the adversary does.*
+> **Know the surface before the adversary does.**
 
----
+<br>
+
+<img src="assets/dashboard-home.png" width="100%">
+
+<br>
 
 ![Python](https://img.shields.io/badge/Python-3.13-blue?style=for-the-badge)
 ![Flask](https://img.shields.io/badge/Flask-Web%20Framework-black?style=for-the-badge)
 ![License](https://img.shields.io/badge/Educational-Use-success?style=for-the-badge)
-![Status](https://img.shields.io/badge/Version-1.0.0-cyan?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-1.0.0-cyan?style=for-the-badge)
 
 </div>
 
@@ -19,120 +23,105 @@
 
 # Overview
 
-OBSIDIAN ATLAS is a passive reconnaissance and attack surface intelligence framework developed for automated external target enumeration.
+**OBSIDIAN ATLAS** is a modular passive reconnaissance and attack surface intelligence framework built for automated external target enumeration.
 
-The framework consolidates multiple reconnaissance modules into a single tactical dashboard capable of collecting publicly available intelligence, analysing attack surface exposure, identifying technologies, inspecting HTTP security posture, and generating professional intelligence reports.
+The framework consolidates multiple reconnaissance modules into a unified tactical dashboard capable of collecting publicly available intelligence, analysing attack surface exposure, identifying technologies, evaluating HTTP security posture, and generating professional intelligence reports.
 
-The platform is designed around a modular architecture, allowing each reconnaissance component to operate independently while contributing to a unified reporting engine.
+Designed around a modular architecture, each reconnaissance engine operates independently while contributing to a centralized reporting pipeline.
+
+---
+
+# Live Demonstration
+
+🎥 **Project Walkthrough**
+
+> Upload your 1-minute demo video to GitHub Releases or convert it into `assets/demo.gif`.
+
+```text
+Demo GIF / Video Here
+```
+
+---
+
+# Dashboard Preview
+
+## Tactical Dashboard
+
+<img src="assets/dashboard-home.png">
+
+---
+
+## Mission Console
+
+<img src="assets/mission-console.png">
+
+---
+
+## Intelligence Report
+
+<img src="assets/report-summary.png">
+
+---
+
+## Download Center
+
+<img src="assets/download-page.png">
 
 ---
 
 # Core Capabilities
 
-- WHOIS Intelligence
-- DNS Enumeration
-- Passive Subdomain Discovery
-- Port Enumeration
-- HTTP Fingerprinting
-- Technology Detection
-- Security Header Analysis
-- Threat Assessment
-- Interactive Mission Console
-- Tactical Dashboard
-- HTML Intelligence Report
-- PDF Export
-- JSON Export
-- CSV Export
+| Module | Description |
+|---------|-------------|
+| WHOIS Intelligence | Domain registration intelligence |
+| DNS Enumeration | Infrastructure mapping |
+| Passive Subdomain Discovery | Attack surface expansion |
+| Port Enumeration | External service exposure |
+| HTTP Fingerprinting | Response analysis & security headers |
+| Technology Detection | Web stack identification |
+| Threat Assessment | Risk scoring & prioritisation |
+| Dashboard | Interactive tactical interface |
+| Reporting | HTML Intelligence Report |
+| Export Engine | PDF, JSON & CSV export |
 
 ---
 
 # Reconnaissance Workflow
 
-```
+```mermaid
+flowchart TD
 
-Acquire Target
+Target --> WHOIS
 
-↓
+WHOIS --> DNS
 
-WHOIS Intelligence
+DNS --> Subdomains
 
-↓
+Subdomains --> Ports
 
-DNS Enumeration
+Ports --> HTTP
 
-↓
+HTTP --> Technology
 
-Passive Subdomain Discovery
+Technology --> Threat
 
-↓
+Threat --> Report
 
-Port Enumeration
-
-↓
-
-HTTP Fingerprinting
-
-↓
-
-Technology Detection
-
-↓
-
-Threat Assessment
-
-↓
-
-Report Generation
-
-↓
-
-Interactive Dashboard
-
+Report --> Dashboard
 ```
 
 ---
 
-# Project Architecture
+# Why OBSIDIAN ATLAS
 
-```
-
-launcher.py
-
-↓
-
-main.py
-
-↓
-
-Recon Modules
-
-├── WHOIS
-
-├── DNS
-
-├── Subdomains
-
-├── Ports
-
-├── HTTP Analysis
-
-├── Technology Detection
-
-└── Threat Engine
-
-↓
-
-Report Generator
-
-↓
-
-Dashboard
-
-↓
-
-Export Engine
-
-```
+- Passive Reconnaissance
+- Modular Architecture
+- Interactive Tactical Dashboard
+- Modern Cyberpunk Interface
+- Professional Intelligence Reports
+- Multiple Export Formats
+- Educational & Defensive Focus
+- Lightweight Flask Backend
 
 ---
 
@@ -140,11 +129,9 @@ Export Engine
 
 ## Passive Intelligence Collection
 
-Collects publicly available information without interacting aggressively with the target infrastructure.
+Collects publicly available intelligence without aggressive interaction with the target infrastructure.
 
----
-
-## WHOIS Intelligence
+### WHOIS Intelligence
 
 - Registrar
 - Creation Date
@@ -155,9 +142,9 @@ Collects publicly available information without interacting aggressively with th
 
 ---
 
-## DNS Enumeration
+### DNS Enumeration
 
-Supports collection of
+Supports
 
 - A Records
 - AAAA Records
@@ -168,31 +155,31 @@ Supports collection of
 
 ---
 
-## Passive Subdomain Discovery
+### Passive Subdomain Discovery
 
-Discovers publicly indexed subdomains using passive intelligence sources.
-
----
-
-## Port Enumeration
-
-Identifies exposed services and evaluates externally accessible ports.
+Discovers publicly indexed subdomains using passive intelligence techniques.
 
 ---
 
-## HTTP Fingerprinting
+### Port Enumeration
+
+Identifies externally exposed services.
+
+---
+
+### HTTP Fingerprinting
 
 Collects
 
 - Response Headers
-- Response Time
 - Status Code
+- Response Time
 - Cookies
 - Security Headers
 
 ---
 
-## Technology Detection
+### Technology Detection
 
 Identifies
 
@@ -204,11 +191,9 @@ Identifies
 
 ---
 
-## Threat Assessment
+### Threat Assessment
 
-Generates a tactical overview based on collected intelligence.
-
-Includes:
+Generates
 
 - Attack Surface
 - Risk Score
@@ -221,7 +206,7 @@ Includes:
 
 # Interactive Dashboard
 
-The generated HTML dashboard contains
+The generated HTML dashboard includes
 
 - Executive Summary
 - Attack Surface Metrics
@@ -233,13 +218,11 @@ The generated HTML dashboard contains
 - Cookie Inspection
 - Technology Profile
 - Threat Factors
-- Report Downloads
+- Export Center
 
 ---
 
 # Export Formats
-
-The framework supports
 
 - HTML
 - PDF
@@ -248,64 +231,45 @@ The framework supports
 
 ---
 
-# Directory Structure
+# Project Structure
 
-```
-
+```text
 ReconToolkit/
 
 ├── launcher.py
-
 ├── main.py
-
 ├── requirements.txt
-
 ├── start_atlas.bat
 
-│
-
 ├── modules/
-
-│ ├── whois_enum.py
-
-│ ├── dns_enum.py
-
-│ ├── subdomain_enum.py
-
-│ ├── port_scan.py
-
-│ ├── http_fingerprint.py
-
-│ ├── tech_detect.py
-
-│ └── report_generator.py
-
-│
+│   ├── whois_enum.py
+│   ├── dns_enum.py
+│   ├── subdomain_enum.py
+│   ├── port_scan.py
+│   ├── http_fingerprint.py
+│   ├── tech_detect.py
+│   └── report_generator.py
 
 ├── templates/
-
 ├── static/
-
 ├── reports/
-
 └── wordlists/
-
 ```
 
 ---
 
 # Installation
 
-Clone repository
+Clone the repository
 
 ```bash
-git clone https://github.com/<username>/obsidian-atlas.git
+git clone https://github.com/ranveer-codes-this/obsidian-atlas-recon-toolkit.git
 ```
 
-Open project
+Move into the project
 
 ```bash
-cd obsidian-atlas
+cd obsidian-atlas-recon-toolkit
 ```
 
 Install dependencies
@@ -330,19 +294,19 @@ start_atlas.bat
 
 # Technology Stack
 
-Backend
+### Backend
 
 - Python
 - Flask
 
-Frontend
+### Frontend
 
 - HTML
 - CSS
 - Vanilla JavaScript
 - Jinja2
 
-Libraries
+### Libraries
 
 - requests
 - dnspython
@@ -358,30 +322,30 @@ Libraries
 This framework is intended for
 
 - Educational Purposes
-- Security Research
 - Defensive Reconnaissance
+- Security Research
 - Internal Security Assessments
 
 ---
 
 # Roadmap
 
-- ASN Enumeration
-- SSL Certificate Analysis
-- WAF Detection
-- Wayback Integration
-- Shodan Integration
-- CVE Correlation
-- Screenshot Engine
-- Docker Support
-- REST API
-- Plugin System
+- [ ] ASN Enumeration
+- [ ] SSL Certificate Analysis
+- [ ] WAF Detection
+- [ ] Wayback Machine Integration
+- [ ] Shodan Integration
+- [ ] CVE Correlation
+- [ ] Screenshot Engine
+- [ ] Docker Support
+- [ ] REST API
+- [ ] Plugin System
 
 ---
 
 # Disclaimer
 
-This framework is intended solely for authorised security assessments, educational purposes, and defensive reconnaissance.
+This project is intended solely for authorised security assessments, educational purposes, and defensive reconnaissance.
 
 Only analyse systems that you own or have explicit permission to assess.
 
@@ -391,10 +355,12 @@ The developers assume no responsibility for misuse of this software.
 
 <div align="center">
 
-**OBSIDIAN ATLAS**
+## OBSIDIAN ATLAS
 
 Passive Attack Surface Intelligence Framework
 
-Version 1.0.0
+**Version 1.0.0**
+
+Made with ❤️ for Cybersecurity Learning
 
 </div>
