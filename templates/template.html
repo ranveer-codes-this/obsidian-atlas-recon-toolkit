@@ -1,0 +1,2715 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBSIDIAN ATLAS - {{ target_domain | default('Target') }}</title>
+
+    <style>
+        :root {
+            --bg-main: #020617;
+            --bg-card: rgba(15, 23, 42, 0.65);
+            --accent-cyan: #00E5FF;
+            --accent-blue: #3B82F6;
+            --accent-purple: #7C3AED;
+            --success: #22C55E;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --text-primary: #E2E8F0;
+            --text-muted: #94A3B8;
+            --font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Background Effects */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.2));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.3;
+        }
+
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+        }
+
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image:
+                linear-gradient(rgba(0, 229, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -2;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 40px 40px;
+            }
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.05) 0%, transparent 50%);
+            animation: gradientMove 15s ease-in-out infinite alternate;
+            z-index: -3;
+        }
+
+        @keyframes gradientMove {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(10%, 10%);
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Sci-Fi Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 0;
+            /* Boxy tech look */
+            padding: 1.5rem;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 229, 255, 0.02);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(16px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+
+        .card-hover:hover {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.15), inset 0 0 20px rgba(0, 229, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .card-hover:hover::before {
+            transform: translateX(100%);
+            transition: transform 0.8s ease;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            margin-top: 0;
+            color: var(--text-primary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h3 {
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+        }
+
+        /* Section 1: Hero */
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 4px solid var(--accent-cyan);
+            background: linear-gradient(180deg, rgba(0, 229, 255, 0.1) 0%, var(--bg-card) 100%);
+        }
+
+        .hero-title {
+            font-size: 1rem;
+            letter-spacing: 4px;
+            margin-bottom: 0.5rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+        }
+
+        .hero-domain {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 3rem;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            color: var(--accent-cyan);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.25rem;
+        }
+
+        .meta-val {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .risk-High {
+            color: var(--danger);
+            text-shadow: 0 0 8px var(--danger);
+        }
+
+        .risk-Medium {
+            color: var(--warning);
+            text-shadow: 0 0 8px var(--warning);
+        }
+
+        .risk-Low {
+            color: var(--success);
+            text-shadow: 0 0 8px var(--success);
+        }
+
+        /* Export Buttons - HUD Style */
+        .hero-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-export {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-cyan);
+            padding: 0.5rem 1rem;
+            clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-export:hover {
+            background: var(--accent-blue);
+            color: #fff;
+            box-shadow: 0 0 15px var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        .btn-export svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        /* Grid Layouts */
+        .grid-top {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 1.5rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        /* Attack Surface List */
+        .attack-surface-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .as-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 0.85rem 1rem;
+            border-left: 2px solid var(--accent-cyan);
+            position: relative;
+        }
+
+        .as-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(0, 229, 255, 0.1), transparent);
+            pointer-events: none;
+        }
+
+        .as-count {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            line-height: 1;
+            text-shadow: 0 0 5px var(--accent-cyan);
+        }
+
+        .as-label {
+            color: var(--text-primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        /* Sci-Fi Metric Cards */
+        .metric-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .metric-card:hover {
+            background: rgba(0, 229, 255, 0.1);
+            box-shadow: inset 0 0 20px rgba(0, 229, 255, 0.2);
+            border-color: var(--accent-cyan);
+        }
+
+        .metric-val {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-cyan);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        .metric-label {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Jarvis Arc Reactor Score */
+        .score-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .gauge-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 1rem 0;
+        }
+
+        .gauge-svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 8px var(--accent-cyan));
+        }
+
+        .gauge-bg {
+            fill: none;
+            stroke: rgba(0, 229, 255, 0.1);
+            stroke-width: 4;
+        }
+
+        .gauge-ring-1 {
+            fill: none;
+            stroke: rgba(0, 229, 255, 0.4);
+            stroke-width: 1;
+            stroke-dasharray: 4 8;
+            transform-origin: center;
+            animation: spin 10s linear infinite;
+        }
+
+        .gauge-ring-2 {
+            fill: none;
+            stroke: rgba(59, 130, 246, 0.5);
+            stroke-width: 2;
+            stroke-dasharray: 20 10;
+            transform-origin: center;
+            animation: spinReverse 15s linear infinite;
+        }
+
+        .gauge-progress {
+            fill: none;
+            stroke-width: 6;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            stroke-linecap: butt;
+            transition: stroke-dashoffset 1.5s ease-out, stroke 0.5s ease;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spinReverse {
+            100% {
+                transform: rotate(-360deg);
+            }
+        }
+
+        .gauge-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .gauge-score {
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1;
+            color: var(--text-primary);
+            text-shadow: 0 0 5px var(--accent-cyan);
+        }
+
+        .gauge-max {
+            font-size: 0.8rem;
+            color: var(--accent-cyan);
+            letter-spacing: 2px;
+        }
+
+        .score-reasons {
+            margin-top: 1.5rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: left;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1rem;
+            border-left: 2px solid var(--warning);
+        }
+
+        .score-reasons p {
+            margin-top: 0;
+            font-weight: 700;
+            color: var(--warning);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .score-reasons ul {
+            padding-left: 1.5rem;
+            margin: 0;
+        }
+
+        .score-reasons li {
+            margin-bottom: 0.25rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        /* Glow Pills (Capsules & Chips) */
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35rem 0.75rem;
+            border-radius: 2px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid transparent;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: monospace;
+        }
+
+        .pill-blue {
+            background: rgba(0, 229, 255, 0.1);
+            color: var(--accent-cyan);
+            border-color: rgba(0, 229, 255, 0.5);
+            box-shadow: inset 0 0 8px rgba(0, 229, 255, 0.2), 0 0 8px rgba(0, 229, 255, 0.2);
+        }
+
+        .pill-orange {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            border-color: rgba(245, 158, 11, 0.5);
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.2);
+        }
+
+        .pill-green {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success);
+            border-color: rgba(34, 197, 94, 0.5);
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.2);
+            border-radius: 12px;
+            /* Subdomain capsules */
+        }
+
+        .pill-purple {
+            background: rgba(124, 58, 237, 0.1);
+            color: #A78BFA;
+            border-color: rgba(124, 58, 237, 0.5);
+            box-shadow: 0 0 8px rgba(124, 58, 237, 0.2);
+        }
+
+        .pill-gray {
+            background: rgba(148, 163, 184, 0.1);
+            color: var(--text-primary);
+            border-color: rgba(148, 163, 184, 0.5);
+        }
+
+        .pill-red {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border-color: rgba(239, 68, 68, 0.5);
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.2);
+        }
+
+        .port-num {
+            font-weight: 800;
+            color: #fff;
+            margin-right: 0.5rem;
+        }
+
+        /* WHOIS Holographic Timeline */
+        .whois-timeline {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 1.5rem 0 2rem 0;
+            position: relative;
+        }
+
+        .timeline-track {
+            flex-grow: 1;
+            height: 1px;
+            background: var(--accent-cyan);
+            margin: 0 1rem;
+            position: relative;
+            box-shadow: 0 0 5px var(--accent-cyan);
+        }
+
+        .timeline-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            z-index: 1;
+            width: 120px;
+        }
+
+        .timeline-year {
+            font-weight: 800;
+            color: var(--accent-cyan);
+            font-size: 1.4rem;
+            text-shadow: 0 0 8px var(--accent-cyan);
+        }
+
+        .timeline-marker {
+            width: 12px;
+            height: 12px;
+            background: rgba(0, 229, 255, 0.2);
+            border: 1px solid var(--accent-cyan);
+            box-shadow: 0 0 10px var(--accent-cyan);
+            transform: rotate(45deg);
+        }
+
+        .timeline-text {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* WHOIS Container */
+        .whois-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .whois-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .whois-row {
+            display: flex;
+            align-items: baseline;
+        }
+
+        .whois-label {
+            color: var(--accent-cyan);
+            min-width: 120px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .whois-val {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-family: monospace;
+            font-size: 0.95rem;
+        }
+
+        .whois-pills {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        /* Accordion - Holographic Expand */
+        .accordion {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .accordion-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 229, 255, 0.1);
+            border-radius: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .accordion-header {
+            padding: 1rem 1.25rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+            user-select: none;
+        }
+
+        .accordion-header:hover {
+            background: rgba(0, 229, 255, 0.05);
+        }
+
+        .accordion-title {
+            font-weight: 700;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+
+        .accordion-inner {
+            padding: 0 1.25rem 1.25rem 1.25rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .accordion-item.active {
+            border-left: 3px solid var(--accent-cyan);
+            background: linear-gradient(90deg, rgba(0, 229, 255, 0.05), transparent);
+            box-shadow: -2px 0 15px rgba(0, 229, 255, 0.1);
+            border-color: rgba(0, 229, 255, 0.3);
+        }
+
+        .accordion-item.active .accordion-content {
+            max-height: 2000px;
+        }
+
+        .accordion-icon {
+            transition: transform 0.3s ease;
+            stroke: var(--accent-cyan);
+        }
+
+        .accordion-item.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Tables & Lists */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-family: monospace;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        .data-table th {
+            color: var(--accent-cyan);
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table td.label {
+            color: var(--accent-cyan);
+            width: 30%;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-family: var(--font-family);
+        }
+
+        /* Security Headers Grid (SOC Telemetry) */
+        .security-headers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .sh-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.85rem;
+            padding: 0.5rem 0.75rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 229, 255, 0.1);
+            font-family: monospace;
+            text-transform: uppercase;
+        }
+
+        .icon-success {
+            color: var(--success);
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-shadow: 0 0 5px var(--success);
+        }
+
+        .icon-danger {
+            color: var(--danger);
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-shadow: 0 0 5px var(--danger);
+        }
+
+        /* Utility */
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .mb-3 {
+            margin-bottom: 1rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1.5rem;
+        }
+
+        .text-muted {
+            color: var(--text-muted);
+        }
+
+        .text-sm {
+            font-size: 0.75rem;
+        }
+
+        .text-danger {
+            color: var(--danger) !important;
+            text-shadow: 0 0 5px var(--danger);
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Search input */
+        .search-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            color: var(--accent-cyan);
+            padding: 0.75rem 1rem;
+            outline: none;
+            margin-bottom: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-family: monospace;
+            text-transform: uppercase;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+        }
+
+        .search-input::placeholder {
+            color: rgba(0, 229, 255, 0.3);
+        }
+
+        /* Terminal Dumps (Cookies) */
+        pre {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+            border: 1px solid rgba(0, 229, 255, 0.1);
+            color: var(--success);
+            text-shadow: 0 0 2px rgba(34, 197, 94, 0.5);
+            border-left: 3px solid var(--success);
+        }
+
+        /* Footer - Stark Industries */
+        footer {
+            text-align: center;
+            color: var(--accent-cyan);
+            padding: 2rem 0;
+            margin-top: 1rem;
+            border-top: 1px solid rgba(0, 229, 255, 0.2);
+            background: linear-gradient(0deg, rgba(0, 229, 255, 0.05) 0%, transparent 100%);
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 4px;
+            color: var(--accent-cyan);
+            text-shadow: 0 0 10px var(--accent-cyan);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-tags {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .footer-tags span {
+            background: rgba(0, 229, 255, 0.1);
+            padding: 0.3rem 0.8rem;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            color: #fff;
+        }
+
+        /* Animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+                filter: blur(4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+                filter: blur(0);
+            }
+        }
+
+        .delay-1 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-3 {
+            animation-delay: 0.3s;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+
+            .grid-top,
+            .grid-2col,
+            .whois-container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .hero {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+            }
+
+            .hero-meta {
+                width: 100%;
+                justify-content: flex-start;
+                gap: 2rem;
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .metrics-grid,
+            .attack-surface-list {
+                grid-template-columns: 1fr;
+            }
+
+            .whois-row {
+                flex-direction: column;
+                gap: 0.25rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .security-headers-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* NEW HERO REDESIGN STYLES V2 */
+        .hero-drop-shadow {
+            filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.2));
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        div.card.hero {
+            border: none !important;
+            box-shadow: none !important;
+            background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-cyan) 5%, rgba(0, 229, 255, 0.1) 15%, rgba(0, 229, 255, 0.1) 85%, var(--accent-purple) 95%, var(--accent-purple) 100%) !important;
+            padding: 2px !important;
+            position: relative;
+            display: block !important;
+            clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0 calc(100% - 15px), 0 15px);
+            margin-bottom: 0 !important;
+        }
+
+        div.card.hero::before,
+        div.card.hero::after {
+            display: none !important;
+        }
+
+        .hero-inner {
+            background: var(--bg-card);
+            width: 100%;
+            clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px);
+            padding: 2rem;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        /* NEW FOOTER STYLES */
+        .footer-new {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2.5rem 2rem;
+            margin-top: 4rem;
+            position: relative;
+            background: rgba(4, 10, 24, 0.5);
+            border-top: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        .footer-new::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.4), transparent);
+        }
+
+        .footer-hex-icon {
+            width: 45px;
+            height: 45px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            color: var(--accent-cyan);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            background: rgba(0, 229, 255, 0.05);
+            margin-right: 1.25rem;
+        }
+
+        .footer-hex-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.5;
+        }
+
+        .footer-side {
+            display: flex;
+            align-items: center;
+        }
+
+        .footer-side-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .footer-side-title {
+            color: var(--accent-cyan);
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+        }
+
+        .footer-side-sub {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .footer-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .footer-center-title {
+            color: var(--accent-cyan);
+            font-size: 0.9rem;
+            letter-spacing: 6px;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .footer-center-sub {
+            color: #ccc;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-center-tech {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            letter-spacing: 1.5px;
+        }
+
+        .footer-divider-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-top: 1.5rem;
+        }
+
+        .footer-divider-line {
+            height: 1px;
+            width: 150px;
+            background: rgba(0, 229, 255, 0.2);
+        }
+
+        .footer-divider-hex {
+            width: 10px;
+            height: 10px;
+            border: 1px solid rgba(0, 229, 255, 0.5);
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            margin: 0 15px;
+        }
+
+        .btn-export-new {
+            background: transparent;
+            border: 1px solid rgba(59, 130, 246, 0.6);
+            color: var(--accent-cyan);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .btn-export-new:hover {
+            background: rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-export-new svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        /* TACTICAL ASSESSMENT STYLES */
+        .tactical-card {
+            background: #0D1424 !important;
+            border: 1px solid rgba(0, 229, 255, 0.2) !important;
+            border-radius: 12px !important;
+            padding: 2.5rem !important;
+            box-shadow: 0 4px 20px rgba(0, 229, 255, 0.05) !important;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .tactical-card:hover {
+            border-color: rgba(0, 229, 255, 0.5) !important;
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.15), inset 0 0 20px rgba(0, 229, 255, 0.05) !important;
+        }
+
+        .tactical-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 24px 24px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .tactical-header {
+            font-family: 'Orbitron', var(--font-logo), sans-serif;
+            font-size: 1.1rem;
+            letter-spacing: 6px;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+            font-weight: 600;
+        }
+
+        .tactical-header::after {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 1px;
+            background: rgba(0, 229, 255, 0.1);
+            margin-top: 1.5rem;
+        }
+
+        .tactical-notch {
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 4px;
+            background: #0D1424;
+            border-top: 1px solid rgba(0, 229, 255, 0.4);
+            border-radius: 2px;
+        }
+
+        .tactical-body {
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            min-height: 280px;
+        }
+
+        .tactical-left {
+            flex: 1;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            z-index: 2;
+            padding: 40px 40px 40px 20px;
+            position: relative;
+        }
+
+        .tactical-circle-svg {
+            width: 240px;
+            height: 240px;
+
+            overflow: visible;
+
+            transform: translateX(-35px);
+        }
+
+        .tactical-circle-text {
+            position: absolute;
+            top: 50%;
+            left: 105px;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .tactical-score {
+            font-size: 4.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1;
+            margin-bottom: -12px;
+        }
+
+        .tactical-max {
+            font-size: 1.1rem;
+            color: var(--accent-cyan);
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 2px;
+        }
+
+        .tactical-middle {
+            width: 42px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: .8rem;
+            z-index: 10;
+            position: relative;
+        }
+
+        .tactical-icon-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            background: rgba(13, 20, 36, 0.6);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            color: #64748B;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .tactical-icon-btn:hover {
+            color: var(--accent-cyan);
+            border-color: rgba(0, 229, 255, 0.6);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+            filter: drop-shadow(0 0 5px var(--accent-cyan));
+        }
+
+        .tactical-icon-btn.active {
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            background: rgba(0, 229, 255, 0.05);
+            box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.1);
+        }
+
+        .tactical-icon-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.5;
+        }
+
+        .tactical-icon-btn.active::after {
+            content: '';
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: transparent transparent transparent var(--accent-cyan);
+            display: block;
+        }
+
+        .tactical-drawer-wrapper {
+            position: absolute;
+            right: -2.5rem;
+            top: -1rem;
+            bottom: -1rem;
+            width: 45%;
+            overflow: hidden;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .tactical-drawer {
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 15, 28, 0.95);
+            backdrop-filter: blur(8px);
+            border-left: 1px solid rgba(0, 229, 255, 0.2);
+            transform: translateX(100%);
+            transition: transform 0.3s ease-out;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            pointer-events: auto;
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .tactical-drawer.open {
+            transform: translateX(0);
+        }
+
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .drawer-title {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--accent-cyan);
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .drawer-close {
+            cursor: pointer;
+            color: #64748B;
+            transition: color 0.2s ease;
+        }
+
+        .drawer-close:hover {
+            color: #fff;
+        }
+
+        .drawer-close svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2;
+        }
+
+        .drawer-panel {
+            display: none;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .drawer-panel.active {
+            display: flex;
+        }
+
+        .drawer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .drawer-label {
+            color: #94A3B8;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+        }
+
+        .drawer-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: #fff;
+            text-align: right;
+        }
+
+        /* New Threat Factors Card styles */
+        .threat-factors-header {
+            font-family: 'Orbitron', var(--font-logo), sans-serif;
+            font-size: 1.1rem;
+            letter-spacing: 6px;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+            font-weight: 600;
+        }
+
+        .threat-factors-header::after {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 1px;
+            background: rgba(0, 229, 255, 0.1);
+            margin-top: 1.5rem;
+        }
+
+        .threat-factors-notch {
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 4px;
+            background: #0D1424;
+            border-top: 1px solid rgba(0, 229, 255, 0.4);
+            border-radius: 2px;
+        }
+
+        .threat-badges-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: flex-start;
+            position: relative;
+            z-index: 1;
+        }
+
+        .threat-badge {
+            display: flex;
+            align-items: center;
+            background: rgba(8, 14, 28, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 245, 255, 0.12);
+            border-radius: 10px;
+            padding: 14px 18px;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: default;
+        }
+
+        .threat-badge:hover {
+            border-color: rgba(0, 245, 255, 0.4);
+            box-shadow: 0 0 15px rgba(0, 245, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .threat-dot {
+            width: 8px;
+            height: 8px;
+            background: #F97316;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            box-shadow: 0 0 6px rgba(249, 115, 22, 0.6);
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .tactical-body {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .tactical-middle {
+                flex-direction: row;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .tactical-drawer-wrapper {
+                width: 100%;
+                right: 0;
+                left: 0;
+                top: 0;
+                bottom: 0;
+            }
+
+
+            .tactical-icon-btn.active::after {
+                right: 50%;
+                top: -12px;
+                transform: translateX(50%);
+                border-color: transparent transparent var(--accent-cyan) transparent;
+            }
+
+            .tactical-icons-container {
+                position: static;
+                transform: none;
+                margin-top: 1.5rem;
+                justify-content: center;
+                right: auto;
+                top: auto;
+            }
+        }
+
+        /* ── PATCH: Icon rail — permanently visible, flush to right inner border ── */
+        .tactical-icons-container {
+            position: absolute;
+            right: -1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            z-index: 10;
+        }
+
+        /* ── PATCH: Inner dashed ring — 18s continuous rotation ── */
+        .tactical-dash-ring {
+            transform-origin: 120px 120px;
+            animation: tacticalRingSpin 18s linear infinite;
+        }
+
+        @keyframes tacticalRingSpin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ── PATCH: Technology Profile Card ── */
+        .technology-profile-card {
+            position: relative;
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 229, 255, 0.02);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 0 1.5rem;
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+            overflow: hidden;
+            z-index: 10;
+
+            /* Hidden State Animation */
+            opacity: 0;
+            transform: translateY(15px);
+            max-height: 0;
+            margin-top: 0;
+            pointer-events: none;
+            transition: opacity 300ms ease, transform 300ms ease, max-height 300ms ease, margin-top 300ms ease, padding 300ms ease;
+        }
+
+        /* Active Hover State */
+        .technology-profile-card.active {
+            opacity: 1;
+            transform: translateY(0);
+            max-height: 400px;
+            margin-top: 1rem;
+            padding: 1.5rem;
+            pointer-events: auto;
+            border-color: rgba(0, 229, 255, 0.4);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.15), inset 0 0 20px rgba(0, 229, 255, 0.05);
+        }
+
+        /* Scanline / Dot Grid Overlay */
+        .technology-profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 24px 24px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .tech-profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (max-width: 600px) {
+            .tech-profile-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .tech-profile-pill {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 229, 255, 0.04);
+            border: 1px solid rgba(0, 229, 255, 0.15);
+            border-radius: 6px;
+            padding: 0.6rem 1rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tech-profile-pill:hover {
+            background: rgba(0, 229, 255, 0.1);
+            border-color: rgba(0, 229, 255, 0.4);
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.15);
+        }
+
+        /* ── PATCH: Technologies Card Redesign ── */
+        .tech-matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tech-matrix-table tr {
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        .tech-matrix-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .tech-matrix-label {
+            padding: 0.85rem 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+            width: 40%;
+        }
+
+        .tech-matrix-value {
+            padding: 0.85rem 0;
+            color: var(--accent-cyan);
+            font-family: monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: right;
+            text-shadow: 0 0 4px rgba(0, 229, 255, 0.2);
+        }
+
+        .cookie-row {
+
+            padding: 15px;
+
+            margin-bottom: 15px;
+
+            background: rgba(0, 0, 0, 0.35);
+
+            border-left: 2px solid #00E5FF;
+
+        }
+
+
+        .cookie-name {
+
+            color: #00E5FF;
+
+            font-weight: 700;
+
+            margin-bottom: 8px;
+
+        }
+
+
+        .cookie-value {
+
+            font-family: monospace;
+
+            font-size: 13px;
+
+            word-break: break-all;
+
+            color: #22C55E;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="scanlines"></div>
+    <canvas id="particles-canvas"></canvas>
+    <div class="grid-bg"></div>
+
+    <div class="container">
+
+        <!-- SECTION 1: HEADER -->
+        <div class="hero-drop-shadow fade-in">
+            <div class="card hero">
+                <div class="hero-inner">
+                    <!-- Dotted grid overlay -->
+                    <div
+                        style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(rgba(0, 229, 255, 0.15) 1px, transparent 1px); background-size: 20px 20px; z-index: 0; pointer-events: none;">
+                    </div>
+
+                    <!-- LEFT SIDE (BRANDING) -->
+                    <div
+                        style="flex: 0 0 42%; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 1;">
+                        <!-- Globe Effect SVG -->
+                        <svg viewBox="0 0 200 200"
+                            style="position: absolute; bottom: -80px; left: -60px; width: 300px; height: 300px; opacity: 0.15; pointer-events: none; z-index: -1;">
+                            <circle cx="100" cy="100" r="90" fill="none" stroke="var(--accent-cyan)"
+                                stroke-width="1.5" />
+                            <ellipse cx="100" cy="100" rx="90" ry="30" fill="none" stroke="var(--accent-cyan)"
+                                stroke-width="0.75" transform="rotate(15 100 100)" />
+                            <ellipse cx="100" cy="100" rx="90" ry="30" fill="none" stroke="var(--accent-cyan)"
+                                stroke-width="0.75" transform="rotate(75 100 100)" />
+                            <ellipse cx="100" cy="100" rx="90" ry="30" fill="none" stroke="var(--accent-cyan)"
+                                stroke-width="0.75" transform="rotate(135 100 100)" />
+                            <ellipse cx="100" cy="100" rx="30" ry="90" fill="none" stroke="var(--accent-cyan)"
+                                stroke-width="0.75" transform="rotate(15 100 100)" />
+                            <path d="M10,100 L190,100 M100,10 L100,190" stroke="var(--accent-cyan)" stroke-width="0.75"
+                                stroke-dasharray="4 4" />
+                        </svg>
+
+                        <!-- Abstract background lines -->
+                        <svg style="position: absolute; top: -20px; left: -20px; width: 100%; height: 150%; opacity: 0.2; pointer-events: none; z-index: -2;"
+                            preserveAspectRatio="none">
+                            <path d="M 0,50 L 50,50 L 70,80 L 150,80" fill="none" stroke="var(--accent-cyan)"
+                                stroke-width="1" />
+                            <circle cx="150" cy="80" r="2" fill="var(--accent-cyan)" />
+                            <path d="M 0,120 L 40,120 L 60,100 L 100,100" fill="none" stroke="var(--accent-cyan)"
+                                stroke-width="1" />
+                            <circle cx="100" cy="100" r="2" fill="var(--accent-cyan)" />
+                        </svg>
+
+                        <div
+                            style="font-family: 'Orbitron', var(--font-logo), monospace; font-size: 3.5rem; font-weight: 500; color: #ffffff; line-height: 1; letter-spacing: 2px;">
+                            OBSIDIAN
+                        </div>
+                        <div
+                            style="display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem; margin-bottom: 0.5rem; width: 100%; max-width: 300px;">
+                            <div style="flex-grow: 1; height: 1px; background: var(--accent-cyan); position: relative;">
+                                <div
+                                    style="position: absolute; left: 0; top: -1.5px; width: 4px; height: 4px; border-radius: 50%; background: var(--accent-cyan);">
+                                </div>
+                            </div>
+                            <div
+                                style="color: var(--accent-cyan); font-size: 1.5rem; letter-spacing: 16px; font-weight: 600;">
+                                ATLAS
+                            </div>
+                            <div style="flex-grow: 1; height: 1px; background: var(--accent-cyan); position: relative;">
+                                <div
+                                    style="position: absolute; right: 0; top: -1.5px; width: 4px; height: 4px; border-radius: 50%; background: var(--accent-cyan);">
+                                </div>
+                            </div>
+                        </div>
+                        <div style="color: var(--text-muted); font-size: 0.85rem; letter-spacing: 0.5px;">
+                            Passive Attack Surface Intelligence Platform
+                        </div>
+                    </div>
+
+                    <!-- RIGHT SIDE (INFO COLUMNS) -->
+                    <div
+                        style="flex: 0 0 55%; display: flex; flex-direction: column; justify-content: space-between; z-index: 1;">
+
+                        <div style="display: flex; justify-content: space-between; width: 100%;">
+                            <!-- TARGET -->
+                            <div
+                                style="display: flex; flex-direction: column; align-items: center; flex: 1; border-right: 1px solid rgba(255,255,255,0.05);">
+                                <div
+                                    style="width: 28px; height: 28px; color: var(--accent-cyan); margin-bottom: 0.75rem;">
+                                    <svg viewBox="0 0 24 24"
+                                        style="stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;">
+                                        <circle cx="12" cy="12" r="10" />
+                                        <path d="M12 2v4M12 18v4M2 12h4M18 12h4" />
+                                    </svg>
+                                </div>
+                                <div
+                                    style="color: var(--accent-cyan); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">
+                                    TARGET</div>
+                                <div
+                                    style="color: #fff; font-size: 1rem; font-family: var(--font-family); font-weight: 500;">
+                                    {{ target_domain }}</div>
+                            </div>
+
+                            <!-- GENERATED -->
+                            <div
+                                style="display: flex; flex-direction: column; align-items: center; flex: 1; border-right: 1px solid rgba(255,255,255,0.05);">
+                                <div
+                                    style="width: 28px; height: 28px; color: var(--accent-cyan); margin-bottom: 0.75rem;">
+                                    <svg viewBox="0 0 24 24"
+                                        style="stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                        <line x1="16" y1="2" x2="16" y2="6" />
+                                        <line x1="8" y1="2" x2="8" y2="6" />
+                                        <line x1="3" y1="10" x2="21" y2="10" />
+                                    </svg>
+                                </div>
+                                <div
+                                    style="color: var(--accent-cyan); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">
+                                    GENERATED</div>
+                                <div
+                                    style="color: #fff; font-size: 1rem; font-family: var(--font-family); font-weight: 500; text-align: center; line-height: 1.4;">
+                                    {{ now }}<br><span style="font-size: 0.85rem; color: var(--text-muted);"></span>
+                                </div>
+                            </div>
+
+                            <!-- MODE -->
+                            <div
+                                style="display: flex; flex-direction: column; align-items: center; flex: 1; border-right: 1px solid rgba(255,255,255,0.05);">
+                                <div
+                                    style="width: 28px; height: 28px; color: var(--accent-cyan); margin-bottom: 0.75rem;">
+                                    <svg viewBox="0 0 24 24"
+                                        style="stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                        <circle cx="12" cy="12" r="3" />
+                                    </svg>
+                                </div>
+                                <div
+                                    style="color: var(--accent-cyan); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">
+                                    MODE</div>
+                                <div
+                                    style="color: #fff; font-size: 1rem; font-family: var(--font-family); font-weight: 500;">
+                                    Passive</div>
+                            </div>
+
+                            <!-- STATUS -->
+                            <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
+                                <div
+                                    style="width: 28px; height: 28px; color: var(--accent-cyan); margin-bottom: 0.75rem;">
+                                    <svg viewBox="0 0 24 24"
+                                        style="stroke: currentColor; fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;">
+                                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                                    </svg>
+                                </div>
+                                <div
+                                    style="color: var(--accent-cyan); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">
+                                    STATUS</div>
+                                <div
+                                    style="color: #22C55E; font-size: 1rem; font-family: var(--font-family); font-weight: 600;">
+                                    COMPLETE</div>
+                            </div>
+                        </div>
+
+                        <!-- Actions Spacer -->
+                        <div style="flex-grow: 1; min-height: 2.5rem;"></div>
+
+                        <!-- Bottom Row: Actions -->
+                        <div
+                            style="display: flex; justify-content: space-between; width: 100%; position: relative; left: -25px;">
+                            <div style="flex: 1;"></div>
+                            <div style="flex: 1; display: flex; justify-content: center;">
+                                <button class="btn-export-new" id="btn-export-pdf">
+                                    <svg viewBox="0 0 24 24">
+                                        <path
+                                            d="M12 16L7 11l1.4-1.4 2.6 2.6V4h2v8.2l2.6-2.6L17 11l-5 5zm-8 4v-5h2v3h12v-3h2v5H4z" />
+                                    </svg>
+                                    EXPORT PDF
+                                </button>
+                            </div>
+                            <div style="flex: 1; display: flex; justify-content: center;">
+                                <button class="btn-export-new" id="btn-export-json">
+                                    <svg viewBox="0 0 24 24">
+                                        <path
+                                            d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
+                                    </svg>
+                                    EXPORT JSON
+                                </button>
+                            </div>
+                            <div style="flex: 1; display: flex; justify-content: center;">
+                                <button class="btn-export-new" id="btn-export-csv">
+                                    <svg viewBox="0 0 24 24">
+                                        <path
+                                            d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7v-7zm4-3h2v10h-2V7zm4 6h2v4h-2v-4z" />
+                                    </svg>
+                                    EXPORT CSV
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-top">
+            <!-- SECTION 2: ATTACK SURFACE & SUMMARY -->
+            <div class="fade-in delay-1" style="display: flex; flex-direction: column; gap: 1rem;">
+
+                <div class="card fade-in delay-1 card-hover">
+                    <h3>Attack Surface</h3>
+                    <div class="attack-surface-list">
+                        {% if attack_surface is iterable and attack_surface is not string %}
+                        {% for item in attack_surface %}
+                        <div class="as-item" {% if item.full_width
+                            %}style="grid-column: 1 / -1; justify-content: center;" {% endif %}>
+                            {% if item.count is defined %}
+                            <span class="as-count counter" data-target="{{ item.count }}">{{ item.count }}</span>
+                            {% endif %}
+                            <span class="as-label {% if item.danger %}text-danger{% endif %}">{{ item.label }}</span>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="as-item"><span class="as-count counter" data-target="5">5</span> <span
+                                class="as-label">subdomains</span></div>
+                        <div class="as-item"><span class="as-count counter" data-target="2">2</span> <span
+                                class="as-label">ports</span></div>
+                        <div class="as-item"><span class="as-count counter" data-target="1">1</span> <span
+                                class="as-label">admin panel</span></div>
+                        <div class="as-item"><span class="as-count counter" data-target="4">4</span> <span
+                                class="as-label">headers</span></div>
+                        <div class="as-item" style="grid-column: 1 / -1; justify-content: center;"><span
+                                class="as-label text-danger" style="font-weight:700;">DNSSEC disabled</span></div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-val counter" data-target="{{ dns_records_count | default(0) }}">0</div>
+                        <div class="metric-label">DNS Records</div>
+                    </div>
+                    <div class="metric-card" id="techCard">
+                        <div class="metric-val counter" data-target="{{ technologies_count | default(0) }}">0</div>
+                        <div class="metric-label">Technologies</div>
+                    </div>
+                </div>
+
+                <!-- SECTION: TECHNOLOGY PROFILE -->
+                <div class="technology-profile-card" id="techProfileCard">
+                    <h3>TECHNOLOGY PROFILE</h3>
+                    <div class="tech-profile-grid">
+                        {% if technologies is iterable and technologies is not string %}
+                        {% for tech in technologies %}
+                        <div class="tech-profile-pill">
+                            <span
+                                style="display: inline-block; width: 6px; height: 6px; background: var(--accent-cyan); margin-right: 0.75rem; box-shadow: 0 0 4px var(--accent-cyan);"></span>
+                            {{ tech }}
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="tech-profile-pill"><span
+                                style="display: inline-block; width: 6px; height: 6px; background: var(--accent-cyan); margin-right: 0.75rem; box-shadow: 0 0 4px var(--accent-cyan);"></span>Google
+                            Web Server</div>
+                        <div class="tech-profile-pill"><span
+                                style="display: inline-block; width: 6px; height: 6px; background: var(--accent-cyan); margin-right: 0.75rem; box-shadow: 0 0 4px var(--accent-cyan);"></span>HTTP/2
+                        </div>
+                        <div class="tech-profile-pill"><span
+                                style="display: inline-block; width: 6px; height: 6px; background: var(--accent-cyan); margin-right: 0.75rem; box-shadow: 0 0 4px var(--accent-cyan);"></span>gzip
+                        </div>
+                        <div class="tech-profile-pill"><span
+                                style="display: inline-block; width: 6px; height: 6px; background: var(--accent-cyan); margin-right: 0.75rem; box-shadow: 0 0 4px var(--accent-cyan);"></span>HSTS
+                        </div>
+                        <div class="tech-profile-pill"><span
+                                style="display: inline-block; width: 6px; height: 6px; background: var(--accent-cyan); margin-right: 0.75rem; box-shadow: 0 0 4px var(--accent-cyan);"></span>CSP
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 3: TACTICAL ASSESSMENT -->
+            <div class="tactical-card fade-in delay-1">
+                <div class="tactical-header">
+                    TACTICAL ASSESSMENT
+                    <div class="tactical-notch"></div>
+                </div>
+
+                <div class="tactical-body">
+                    <div class="tactical-left">
+                        <svg viewBox="0 0 240 240" width="240" height="240" class="tactical-circle-svg"
+                            overflow="visible">
+                            <defs>
+                                <radialGradient id="innerGlow" cx="50%" cy="50%" r="50%">
+                                    <stop offset="0%" stop-color="rgba(0, 229, 255, 0.12)" />
+                                    <stop offset="100%" stop-color="transparent" />
+                                </radialGradient>
+                                <pattern id="dots" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse">
+                                    <circle cx="1.5" cy="1.5" r="1" fill="rgba(255,255,255,0.07)" />
+                                </pattern>
+                                <!-- Soft bloom filter — natural fade, no square clipping -->
+                                <filter id="ringGlow" x="-20%" y="-20%" width="140%" height="140%"
+                                    color-interpolation-filters="sRGB">
+                                    <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="glow" />
+                                    <feMerge>
+                                        <feMergeNode in="glow" />
+                                        <feMergeNode in="glow" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                            </defs>
+
+                            <!-- Dark HUD background — inner glow fill + dot matrix texture -->
+                            <circle cx="120" cy="120" r="95" fill="url(#innerGlow)" />
+                            <circle cx="120" cy="120" r="95" fill="url(#dots)" />
+
+                            <!-- Inner dashed ring — rotates continuously at 18s -->
+                            <circle class="tactical-dash-ring" cx="120" cy="120" r="102" fill="none"
+                                stroke="rgba(0, 229, 255, 0.35)" stroke-width="1.5" stroke-dasharray="3 5" />
+
+                            <!-- Outer exposure ring — #00F5FF, 6px, soft bloom only -->
+                            <circle cx="120" cy="120" r="112" fill="none" stroke="#00F5FF" stroke-width="6"
+                                stroke-linecap="round" filter="url(#ringGlow)" />
+                        </svg>
+                        <div class="tactical-circle-text">
+                            <!-- Preserving id="score-val" but omitting counter class to keep it purely static while not crashing JS -->
+                            <div class="tactical-score" id="score-val" data-target="{{ risk_score | default(76) }}">{{
+                                risk_score | default(76) }}</div>
+                            <div class="tactical-max">/ 100</div>
+                        </div>
+                    </div>
+
+                    <div class="tactical-icons-container">
+                        <div class="tactical-middle" style="position: relative;">
+                            {% set score = risk_score | default(76) | int %}
+                            {% if score < 40 %} {% set cond='Safe' %} {% set cond_col='var(--success)' %} {% set
+                                as_text='Nominal' %} {% set as_col='var(--success)' %} {% set pri='P4' %} {% set
+                                pri_col='var(--accent-cyan)' %} {% elif score < 80 %} {% set cond='Medium' %} {% set
+                                cond_col='#FFA500' %} {% set as_text='Elevated' %} {% set as_col='#FF8A00' %} {% set
+                                pri='P2' %} {% set pri_col='#FFA500' %} {% else %} {% set cond='Critical' %} {% set
+                                cond_col='var(--danger)' %} {% set as_text='High' %} {% set as_col='var(--danger)' %} {%
+                                set pri='P1' %} {% set pri_col='var(--danger)' %} {% endif %} <button
+                                class="tactical-icon-btn" data-label="CONDITION" data-val="{{ cond }}"
+                                data-val-col="{{ cond_col }}" title="Condition">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                    <path d="M9 12l2 2 4-4" />
+                                </svg>
+                                </button>
+                                <button class="tactical-icon-btn" data-label="EXPOSURE"
+                                    data-val="{{ risk_score | default(76) }} / 100" data-val-col="#FFFFFF"
+                                    title="Exposure">
+                                    <svg viewBox="0 0 24 24">
+                                        <circle cx="12" cy="12" r="10" />
+                                        <circle cx="12" cy="12" r="3" />
+                                        <line x1="12" y1="2" x2="12" y2="22" />
+                                        <line x1="2" y1="12" x2="22" y2="12" />
+                                    </svg>
+                                </button>
+                                <button class="tactical-icon-btn" data-label="ATTACK SURFACE" data-val="{{ as_text }}"
+                                    data-val-col="{{ as_col }}" title="Attack Surface">
+                                    <svg viewBox="0 0 24 24">
+                                        <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                                        <polyline points="2 12 12 17 22 12" />
+                                        <polyline points="2 17 12 22 22 17" />
+                                    </svg>
+                                </button>
+                                <button class="tactical-icon-btn" data-label="PRIORITY" data-val="{{ pri }}"
+                                    data-val-col="{{ pri_col }}" title="Priority">
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+                                        <line x1="4" y1="22" x2="4" y2="15" />
+                                    </svg>
+                                </button>
+                                <button class="tactical-icon-btn" data-label="CONFIDENCE" data-val="91%"
+                                    data-val-col="#00E0FF" title="Confidence">
+                                    <svg viewBox="0 0 24 24">
+                                        <line x1="18" y1="20" x2="18" y2="10" />
+                                        <line x1="12" y1="20" x2="12" y2="4" />
+                                        <line x1="6" y1="20" x2="6" y2="14" />
+                                    </svg>
+                                </button>
+
+                                <div class="tactical-tray-mask"
+                                    style="position: absolute; right: 100%; top: 0; bottom: 0; width: 260px; overflow: hidden; pointer-events: none; z-index: 5;">
+                                    <div id="iconTray"
+                                        style="box-sizing: border-box; position: absolute; right: 0; top: 0; width: 260px; height: 40px; display: flex; justify-content: space-between; align-items: center; padding: 0 24px; gap: 16px; background: #0D1424; border: 1px solid rgba(0, 229, 255, 0.2); border-right: none; border-radius: 8px 0 0 8px; box-shadow: -4px 0 15px rgba(0, 229, 255, 0.05); transform: translateX(100%); transition: transform 0.25s ease-out, top 0.1s ease-out, opacity 0.25s ease-out; opacity: 0; pointer-events: auto;">
+                                        <div id="trayLabel"
+                                            style="font-family: 'Inter', sans-serif; font-size: 0.75rem; font-weight: 600; color: #A9B2C3; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                            CONDITION</div>
+                                        <div id="trayValue"
+                                            style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; color: #FFA500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right;">
+                                            Medium</div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SECTION: THREAT FACTORS -->
+        <div class="card fade-in delay-2 card-hover" style="margin-top: 1.5rem;">
+            <h3>Threat Factors</h3>
+            <div class="threat-badges-container">
+                {% if risk_reasons is iterable and risk_reasons is not string %}
+                {% for reason in risk_reasons %}
+                <div class="threat-badge">
+                    <span class="threat-dot"></span>
+                    {{ reason }}
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="threat-badge"><span class="threat-dot"></span>DNSSEC Disabled</div>
+                <div class="threat-badge"><span class="threat-dot"></span>Admin Subdomain Found</div>
+                <div class="threat-badge"><span class="threat-dot"></span>Missing CSP</div>
+                <div class="threat-badge"><span class="threat-dot"></span>No HSTS</div>
+                <div class="threat-badge"><span class="threat-dot"></span>Open Management Ports</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- SECTION 4: WHOIS INFORMATION --> {{ whois }}
+        <div class="card fade-in delay-2 card-hover">
+            <h3>Intelligence Feed: WHOIS</h3>
+
+            <div class="whois-timeline">
+                <div class="timeline-item">
+                    {% set creation_year = created_year %}
+                    <div class="timeline-year">{{ creation_year }}</div>
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-text">Created</div>
+                    <div
+                        style="font-size: 0.75rem; margin-top: 0.25rem; font-family: monospace; color: var(--accent-cyan);">
+                        {{ created_date }}</div>
+                </div>
+                <div class="timeline-track"></div>
+                <div class="timeline-item">
+                    {% set exp_year = expiry_year %}
+                    <div class="timeline-year" style="color: var(--warning); text-shadow: 0 0 8px var(--warning);">{{
+                        exp_year }}</div>
+                    <div class="timeline-marker"
+                        style="background: rgba(245, 158, 11, 0.2); border-color: var(--warning); box-shadow: 0 0 10px var(--warning);">
+                    </div>
+                    <div class="timeline-text">Expires</div>
+                    <div
+                        style="font-size: 0.75rem; margin-top: 0.25rem; font-family: monospace; color: var(--warning);">
+                        {{ expiry_date }}</div>
+                </div>
+            </div>
+
+            <div class="whois-container"
+                style="margin-top: 1.5rem; border-top: 1px dashed rgba(0,229,255,0.3); padding-top: 1.5rem;">
+                <div class="whois-col">
+                    <div class="whois-row">
+                        <div class="whois-label">Registrar</div>
+                        <div class="whois-val">{{ registrar }}</div>
+                    </div>
+                    <div class="whois-row">
+                        <div class="whois-label">DNSSEC</div>
+                        <div class="whois-val" style="color: var(--danger);">{{ dnssec }}</div>
+                    </div>
+                </div>
+                <div class="whois-col">
+                    <div class="whois-row" style="flex-direction: column; align-items: flex-start;">
+                        <div class="whois-label mb-2">Name Servers</div>
+                        <div class="whois-pills">
+                            {% if nameservers %}
+                            {% for ns in nameservers %}
+                            <span class="pill pill-blue">{{ ns }}</span>
+                            {% endfor %}
+                            {% else %}
+                            {{ nameservers | join(', ') }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="whois-row" style="flex-direction: column; align-items: flex-start;">
+                        <div class="whois-label mb-2">Statuses</div>
+                        <div class="whois-pills">
+                            {% if statuses is iterable and statuses is not string %}
+                            {% for st in statuses %}
+                            <span class="pill pill-orange">{{ st }}</span>
+                            {% endfor %}
+                            {% else %}
+                            {{ statuses | default('None') }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 5: DNS RECORDS -->
+        <div class="card fade-in delay-2 card-hover">
+            <h3>DNS Records</h3>
+            <div class="accordion" id="dns-accordion">
+                {% set dns_sections = [
+                ('A', 'A Records', 'pill-blue', ''),
+                ('AAAA', 'AAAA Records', 'pill-blue', ''),
+                ('MX', 'MX Records', 'pill-purple', ''),
+                ('TXT', 'TXT Records', 'pill-gray', ''),
+                ('NS', 'NS Records', 'pill-gray', ''),
+                ('CNAME', 'CNAME Records', 'pill-orange', '')
+                ] %}
+
+                {% if dns is mapping %}
+                {% for key, label, pill_class, active_class in dns_sections %}
+                <div class="accordion-item {{ active_class }}">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title">{{ label }}</span>
+                        <svg class="accordion-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-inner pt-2">
+                            {% for record in dns.get(key, []) %}
+                            <span class="pill {{ pill_class }}">{{ record }}</span>
+                            {% else %}
+                            <span class="text-muted text-sm">No {{ key }} records found.</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                {{ dns | default('No records available') }}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="grid-2col fade-in delay-3">
+            <!-- SECTION 6: SUBDOMAINS -->
+            <div class="card card-hover">
+                <div class="flex-between mb-4">
+                    <h3 style="margin:0;">Subdomains</h3>
+                    <span class="pill pill-gray" style="margin:0;">Count: {{ subdomains|length }}</span>
+                </div>
+                <div class="whois-pills">
+                    {% if subdomains %}
+                    {% for sub in subdomains %}
+                    <span class="pill pill-green">{{ sub }}</span>
+                    {% endfor %}
+                    {% else %}
+                    {{ subs | default('No Subdomains Found') }}
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- SECTION 7: PORT SCANNING -->
+            <div class="card card-hover">
+                <h3 class="mb-4">Open Ports</h3>
+                <div class="whois-pills">
+                    {% if ports is iterable and ports is not string %}
+                    {% for p in ports %}
+                    <span class="pill {{ p.color | default('pill-blue') }}">
+                        <span class="port-num">{{ p.number }}</span> {{ p.service }}
+                    </span>
+                    {% endfor %}
+                    {% else %}
+                    {{ ports | default('None') }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-2col fade-in delay-3">
+            <!-- SECTION 8: HTTP ANALYSIS -->
+            <div class="card card-hover">
+                <h3 class="mb-4">HTTP Analysis</h3>
+                <table class="data-table mb-4">
+                    <tbody>
+                        {% if http is mapping %}
+                        <tr>
+                            <td class="label">Status Code</td>
+                            <td style="color: var(--success); text-shadow: 0 0 5px var(--success);">{{ http.status_code
+                                }}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Server</td>
+                            <td>{{ http.server }}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Response Time</td>
+                            <td>{{ http.response_time }}</td>
+                        </tr>
+                        {% else %}
+                        {{ http | default('<tr>
+                            <td>No HTTP data</td>
+                        </tr>') }}
+                        {% endif %}
+                    </tbody>
+                </table>
+
+                <h4 class="mb-3"
+                    style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-cyan); border-bottom: 1px dashed rgba(0,229,255,0.3); padding-bottom: 0.5rem;">
+                    Security Headers</h4>
+                <div class="security-headers-grid">
+                    {% if security_headers is iterable and security_headers is not string %}
+                    {% for header in security_headers %}
+                    <div class="sh-item">
+                        {% if header['secure'] %}
+                        <span class="icon-success">✔</span>
+                        {% else %}
+                        <span class="icon-danger">✖</span>
+                        {% endif %}
+                        {{ header.name }}
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="sh-item"><span class="icon-success">✔</span> CSP</div>
+                    <div class="sh-item"><span class="icon-success">✔</span> HSTS</div>
+                    <div class="sh-item"><span class="icon-success">✔</span> XFO</div>
+                    <div class="sh-item"><span class="icon-danger">✖</span> Permissions Policy</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- SECTION 9: TECHNOLOGIES -->
+            <div class="card card-hover">
+                <h3 class="mb-4">Technologies</h3>
+                {% if technologies is iterable and technologies is not string %}
+                <table class="tech-matrix-table">
+                    <tbody>
+                        <tr>
+                            <td class="tech-matrix-label">Web Server</td>
+                            <td class="tech-matrix-value">
+                                {{ http.server if http and http.server else 'None' }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tech-matrix-label">Protocol</td>
+                            <td class="tech-matrix-value">
+                                {% for tech in technologies if 'http' in tech.lower() or 'quic' in tech.lower() or
+                                'spdy' in tech.lower() %}
+                                {{ tech }}{% if not loop.last %}, {% endif %}
+                                {% else %}
+                                None
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tech-matrix-label">Compression</td>
+                            <td class="tech-matrix-value">
+                                {% for tech in technologies if 'gzip' in tech.lower() or 'brotli' in tech.lower() or
+                                'deflate' in tech.lower() %}
+                                {{ tech }}{% if not loop.last %}, {% endif %}
+                                {% else %}
+                                None
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tech-matrix-label">Security</td>
+                            <td class="tech-matrix-value">
+                                {% for tech in technologies if 'hsts' in tech.lower() or 'csp' in tech.lower() or 'ssl'
+                                in tech.lower() or 'tls' in tech.lower() or 'secure' in tech.lower() or 'header' in
+                                tech.lower() %}
+                                {{ tech }}{% if not loop.last %}, {% endif %}
+                                {% else %}
+                                None
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="text-muted">{{ technologies | default('None') }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- SECTION 10: HEADERS -->
+        <div class="card fade-in delay-3 card-hover">
+            <h3 class="mb-4">SOC Telemetry: Headers</h3>
+            <input type="text" class="search-input" id="headers-search" placeholder="QUERY HEADERS...">
+            <div class="accordion" id="headers-accordion">
+                {% if headers %}
+                <p style="color:red;">
+                    Headers Count :
+                    {{ headers|length }}
+                </p>
+                {% for key, val in headers.items() %}
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title">{{ key }}</span>
+                        <svg class="accordion-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-inner" style="color: var(--accent-cyan); word-break: break-all;">
+                            {{ val }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                {{ headers | default('None') }}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- SECTION 11: COOKIES -->
+        <div class="card fade-in delay-3 card-hover">
+            <h3 class="mb-4">Terminal Dump: Cookies</h3>
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title">DECRYPT COOKIES</span>
+                        <svg class="accordion-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-inner pt-2">
+
+                            {% if cookies %}
+
+                            {% for name,value in cookies.items() %}
+
+                            <div class="cookie-row">
+
+                                <div class="cookie-name">
+                                    {{ name }}
+                                </div>
+
+                                <div class="cookie-value">
+                                    {{ value }}
+                                </div>
+
+                            </div>
+
+                            {% endfor %}
+
+                            {% else %}
+
+                            No cookies found.
+
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 12: FOOTER -->
+        <footer class="footer-new fade-in delay-3">
+            <div class="footer-side">
+                <div class="footer-hex-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                </div>
+                <div class="footer-side-text">
+                    <span class="footer-side-title">SYSTEM ONLINE</span>
+                    <span class="footer-side-sub">All systems operational</span>
+                </div>
+            </div>
+
+            <div class="footer-center">
+                <div class="footer-center-title">OBSIDIAN ATLAS</div>
+                <div class="footer-center-sub">Passive Attack Surface Intelligence Platform</div>
+                <div class="footer-center-tech">Python &nbsp;·&nbsp; Jinja2 &nbsp;·&nbsp; HTML &nbsp;·&nbsp; CSS
+                    &nbsp;·&nbsp; Vanilla JS</div>
+                <div class="footer-divider-container">
+                    <div class="footer-divider-line"></div>
+                    <div class="footer-divider-hex"></div>
+                    <div class="footer-divider-line"></div>
+                </div>
+            </div>
+
+            <div class="footer-side">
+                <div class="footer-side-text" style="text-align: right; margin-right: 1.25rem;">
+                    <span class="footer-side-title">SECURE CONNECTION</span>
+                    <span class="footer-side-sub">256-bit SSL encrypted</span>
+                </div>
+                <div class="footer-hex-icon" style="margin-right: 0;">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Particles System
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 2;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * -0.5 - 0.1;
+                this.opacity = Math.random() * 0.5 + 0.1;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.y < 0) {
+                    this.y = height;
+                    this.x = Math.random() * width;
+                }
+            }
+            draw() {
+                ctx.fillStyle = `rgba(0, 229, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            let count = Math.floor((width * height) / 10000);
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+        initParticles();
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // Accordion Logic
+        function toggleAccordion(element) {
+            const item = element.parentElement;
+            item.classList.toggle('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Gauge Logic
+            const scoreRaw = "{{ risk_score | default('0') }}";
+            const score = parseInt(scoreRaw) || parseInt(document.getElementById('score-val').getAttribute('data-target')) || 0;
+
+            const gaugeProgress = document.getElementById('score-gauge');
+            const heroRiskLabel = document.getElementById('hero-risk-label');
+            const gaugeRiskLabel = document.getElementById('gauge-risk-label');
+
+            const radius = 70;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (score / 100) * circumference;
+            function bindExportButton(id, route) {
+
+                const btn = document.getElementById(id);
+
+                if (!btn) return;
+
+                btn.addEventListener("click", () => {
+                    window.location.href = route;
+                });
+
+            }
+
+            bindExportButton("btn-export-pdf", "/export/pdf");
+            bindExportButton("btn-export-json", "/export/json");
+            bindExportButton("btn-export-csv", "/export/csv");
+            let color = 'var(--success)';
+            let riskText = 'Low Risk';
+            let riskClass = 'risk-Low';
+
+            if (score < 50) {
+                color = 'var(--danger)';
+                riskText = 'Critical';
+                riskClass = 'risk-High';
+            } else if (score <= 80) {
+                color = 'var(--warning)';
+                riskText = 'Elevated';
+                riskClass = 'risk-Medium';
+            }
+
+            setTimeout(() => {
+                if (gaugeProgress) {
+                    gaugeProgress.style.strokeDashoffset = offset;
+                    gaugeProgress.style.stroke = '#00F5FF';
+                    gaugeProgress.style.filter = 'none';
+                }
+            }, 300);
+
+            if (heroRiskLabel) {
+                heroRiskLabel.textContent = riskText.split(' ')[0];
+                heroRiskLabel.className = 'meta-val risk-label ' + riskClass;
+            }
+            if (gaugeRiskLabel) {
+                gaugeRiskLabel.textContent = riskText;
+                gaugeRiskLabel.style.color = color;
+                gaugeRiskLabel.style.textShadow = `0 0 8px ${color}`;
+            }
+
+            // Animate Counters
+            const counters = document.querySelectorAll('.counter');
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                if (isNaN(target) || target === 0) return;
+
+                const duration = 1500;
+                const increment = target / (duration / 16);
+                let current = 0;
+
+                const updateCounter = () => {
+                    current += increment;
+                    if (current < target) {
+                        counter.innerText = Math.ceil(current);
+                        requestAnimationFrame(updateCounter);
+                    } else {
+                        counter.innerText = target;
+                    }
+                };
+                updateCounter();
+            });
+
+            // Header Search Filter
+            const searchInput = document.getElementById('headers-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', function (e) {
+                    const term = e.target.value.toLowerCase();
+                    const items = document.querySelectorAll('#headers-accordion .accordion-item');
+                    items.forEach(item => {
+                        const titleEl = item.querySelector('.accordion-title');
+                        if (titleEl) {
+                            const title = titleEl.innerText.toLowerCase();
+                            if (title.includes(term)) {
+                                item.style.display = 'block';
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        }
+                    });
+                });
+            }
+
+            // Tactical Drawer Logic
+            const tacticalMiddle = document.querySelector('.tactical-middle');
+            const tacticalBtns = document.querySelectorAll('.tactical-icon-btn');
+            const iconTray = document.getElementById('iconTray');
+            const trayLabel = document.getElementById('trayLabel');
+            const trayValue = document.getElementById('trayValue');
+            let hideTimeout;
+
+            if (tacticalMiddle && tacticalBtns.length > 0 && iconTray) {
+                tacticalBtns.forEach(btn => {
+                    btn.addEventListener('mouseenter', () => {
+                        clearTimeout(hideTimeout);
+                        tacticalBtns.forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+
+                        if (trayLabel) trayLabel.innerText = btn.getAttribute('data-label');
+                        if (trayValue) {
+                            trayValue.innerText = btn.getAttribute('data-val');
+                            trayValue.style.color = btn.getAttribute('data-val-col');
+                        }
+
+                        const topOffset = btn.offsetTop;
+                        iconTray.style.top = topOffset + 'px';
+
+                        iconTray.style.transform = 'translateX(0)';
+                        iconTray.style.opacity = '1';
+                    });
+                });
+
+                tacticalMiddle.addEventListener('mouseleave', () => {
+                    hideTimeout = setTimeout(() => {
+                        iconTray.style.transform = 'translateX(100%)';
+                        iconTray.style.opacity = '0';
+                        tacticalBtns.forEach(b => b.classList.remove('active'));
+                    }, 50);
+                });
+
+                iconTray.addEventListener('mouseenter', () => {
+                    clearTimeout(hideTimeout);
+                });
+            }
+
+            // Hover logic for Technologies card -> Technology Profile
+            const techCard = document.getElementById('techCard');
+            const techProfileCard = document.getElementById('techProfileCard');
+
+            if (techCard && techProfileCard) {
+                techCard.addEventListener('mouseenter', () => {
+                    techProfileCard.classList.add('active');
+                });
+                techCard.addEventListener('mouseleave', () => {
+                    techProfileCard.classList.remove('active');
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# OBSIDIAN ATLAS
+reports/
+debug.html
+atlas_setup.done
+Resources/
